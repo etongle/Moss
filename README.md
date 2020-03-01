@@ -7,6 +7,7 @@
     />
   </a>
 </p>
+Moss(莫斯),让Spring Cloud应用不再流浪！
 
 ---
 
@@ -18,12 +19,19 @@
 
 ### 1.2 Moss概述
 
- Moss(`莫斯`)是`服务治理平台的代号`，取名灵感来自电影《流浪地球》中的莫斯(Moss),Moss是电影《流浪地球》中领航员号空间站的人工智能机器人-负责管理空间站所有事务以及流浪地球的计划，而Moss跟Boos一样，是所有微服务的老板，所有微服务的生命周期将归其统管。
+ Moss(`莫斯`)是`服务治理平台的代号`，取名灵感来自电影《流浪地球》中的莫斯(Moss),Moss是电影《流浪地球》中领航员号空间站的人工智能机器人-负责管理空间站所有事务以及流浪地球的计划，而Moss跟Boss一样，是所有微服务的老板，所有微服务的生命周期将归其统管。
  
  为什么会`出现Moss`？因为基于Spring Cloud的微服务体系，`缺乏统一的可视化的纳管治理平台`。
  
  >Spring Cloud中国社区从2017年11月份，开始规划Spring Cloud Admin的开发和设计，专注于研究这个领域。Moss将会选择一个合适的时机开源，需要更多了解的可以加我微信Software_King。
  
+ **Moss-钉钉答疑群:
+ 
+ <img
+      alt="moss"
+      src="/doc/images/ddq.jpeg"
+      width="25%" />
+       
  #### 1.2.1 竞品分析
 
  Moss的竞品分析对比如下表所示:
@@ -32,9 +40,10 @@
 | --- | --- | --- |
 | **服务画像** | ❌ | ✅|
 | **服务实例画像** | ☑️ | ✅|
-| **支持单Eureka**|  ☑️ | ✅|
-| **支持单Nacos**|  ☑️ | ✅|
-| **支持多Eureka，在线动态增加，删除,切换**|  ❌️ | ✅|
+| **支持单Eureka集群**|  ☑️ | ✅|
+| **支持单Consul集群**|  ☑️ | ✅|
+| **支持单Nacos集群**|  ☑️ | ✅|
+| **支持多Eureka集群，在线动态增加，删除,切换**|  ❌️ | ✅|
 |  前端技术| Vue | Ant Design Pro|
 |  **支持Spring Boot 1.5.X和Spring Boot 2.0.X**| ☑️ | ✅|
 |  **服务调用拓扑**| ❌ | ✅|
@@ -59,6 +68,14 @@ Roadmap 时间点：
 | -------- | -------- | -------- |
 | ✅1.0.0.RELEASE     | **2019.4.21** | 稳定可用版本|
 
+#### 1.2.2 Moss开发团队
+
+| 姓名 | 角色 | github地址|
+| -------- | -------- | -------- |
+|    SoftwareKing  | Owner | https://github.com/SoftwareKing|
+|   iShawnWang  | 前端开发 | https://github.com/iShawnWang |
+| homeant | 前后台开发 | https://github.com/homeant |
+| VancySavoki | 后端开发 | https://github.com/VancySavoki |
 
 ### 1.3 Moss的功能
 
@@ -178,9 +195,9 @@ moss客户端主要用于内置预设自研端点和管理配置信息，使接�
 
 #### 2.3.1 Moss-Client
 
-Moss客户端支持两种Spring Boot版本，分别是Spring Boot 1.5.X和Spring Boot 2.X，使用只需引入moss-client-starter即可。示例2.x的客户端如下所示。
+Moss客户端支持两种Spring Boot版本，分别是Spring Boot 1.5.X和Spring Boot 2.X，使用只需引入 moss-client 即可。示例2.x的客户端如下所示。
 
-1.引入moss-client-starter
+1.引入 moss-client
 
 ```xml
 <dependency>
@@ -219,39 +236,24 @@ info.version: @project.version@
 
 #### 2.3.2 导入IDE运行
 
-1.创建数据库moss，执行sql文件:/Moss/doc/sql/moss-init.sql
+1. 为方便快速演示，默认内置了 h2 数据库。
+3. 导入 IDEA 运行主程序org.xujin.moss.MossApplication.java
+4. 启动之后访问 http://localhost:8086/
+* 用户名 -  xujin
+* 密码 - 123456
+5. 如需修改后端数据库，将 moss-web/src/main/resources/config/application.yml 
+中 `spring.profiles.active` 的 h2 改为 mysql，并修改 application-mysql 中的连接地址、username/password。
 
-2. 修改Moss/moss-web/src/main/resources/application.yml文件，数据库链接如下所示:
+#### 2.3.3 docker镜像运行
 
-```yml
-spring:
-  application:
-    name: halo-moss
-  datasource:
-    url: jdbc:mysql://ip:端口/moss?useUnicode=true&characterEncoding=utf8
-    ## 生产用户名和密码
-    username: 用户名
-    password: 密码
-    driver-class-name: com.mysql.jdbc.Driver
-    type: com.alibaba.druid.pool.DruidDataSource
-    filters: stat
-    maxActive: 20
-    initialSize: 1
-    maxWait: 60000
-    minIdle: 1
-    timeBetweenEvictionRunsMillis: 60000
-    minEvictableIdleTimeMillis: 300000
-    validationQuery: select 'x'
-    testWhileIdle: true
-    testOnBorrow: false
-    testOnReturn: false
-    poolPreparedStatements: true
-    maxOpenPreparedStatements: 20
-```
+1.根目录安装各个依赖
+`mvn install -Dmaven.test.skip=true`
 
-3.运行主程序org.xujin.moss.MossApplication.java
+2.根目录进入moss-web目录 docker镜像打包：
+`cd moss-web && mvn package && mvn docker:build`
 
-4.启动之后访问http://localhost:8080/，用户名:xujin和密码:123456
+3.根目录进入docker-compose启动
+`cd docker-compose && docker-compose -f docker-compose.yml up`
 
 
 ## 3.Moss的实现细节
@@ -267,11 +269,32 @@ spring:
 * 注册到Eureka上的应用名为大写，而注册到Nacos上的应用名为小写,Moss需要忽略大小写匹配
 * 等等~~~~~~~~~~~~~
 
-## 4 GC日志路径设置:
+## 4 GC日志路径设置参考
 
--Xloggc:/opt/logs/gc.log -verbose.gc
+`-Xloggc:${YOUR_WORK_DIR}/logs/${APP_NAME}/gc.log -verbose.gc -XX:+PrintGCDateStamps`
 
+```yaml
+logging:
+  registry:
+    files:
+    - name: gclog
+      path: logs/${spring.application.name}/gc.log
+```
+
+
+### 4.1 切换支持注册中心
+默认的注册注册中心是 eureka，如果希望切换到其他注册中心，如 ZooKeeper,
+可以通过激活 profile 切换注册中心。在以下 pom 中已预设两种注册中心，使用时自行切换即可。
+
+* moss-web/pom.xml
+* moss-service/pom.xml
+* moss-client/moss-sample-2.1.x
+* moss-client/moss-sample-1.5.x
 
 ## 5.致谢
 
 Moss中的moss-adapter-cloud和moss-core模块部分代码参考了 [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin)，感谢 Codecentric 开源了该框架。
+
+## 6.Stargazers over time
+ 
+ [![Stargazers over time](https://starchart.cc/SpringCloud/Moss.svg)](https://starchart.cc/SpringCloud/Moss)
